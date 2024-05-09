@@ -2,6 +2,7 @@ import torch
 from agent import QEDRewardMolecule, Agent
 import config
 import math
+import heapq
 import utils
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
@@ -9,9 +10,9 @@ from torch.utils.tensorboard import SummaryWriter
 TENSORBOARD_LOG = True
 TB_LOG_PATH = "./runs/dqn/run2"
 episodes = 0
-iterations = 200_000
+iterations = 4000
 update_interval = 20
-batch_size = 128
+batch_size = 64
 num_updates_per_it = 1
 
 if torch.cuda.is_available():
@@ -40,6 +41,10 @@ if TENSORBOARD_LOG:
     writer = SummaryWriter(TB_LOG_PATH)
 
 environment.initialize()
+
+max_rewards = [-np.inf]
+max_rewards_smiles = [None]
+max_rewards_min_idx = max_rewards.index(min(max_rewards))
 
 eps_threshold = 1.0
 batch_losses = []
@@ -107,7 +112,7 @@ for it in range(iterations):
 
     # Update replay buffer (state: (fingerprint_length + 1), action: _, reward: (), next_state: (num_actions,
     # fingerprint_length + 1), done: ()
-    print(action_fingerprints.shape)
+    # print(action_fingerprints.shape)
     agent.replay_buffer.add(
         obs_t=action_fingerprint,  # (fingerprint_length + 1)
         action=0,  # No use
@@ -132,6 +137,22 @@ for it in range(iterations):
                     episodes, np.array(batch_losses).mean()
                 )
             )
+
+        # The final state
+        curr_state = environment.state
+        # Store file
+        if len(max_rewards) < 10:
+            max_rewards.append(final_reward)
+            max_rewards_smiles.append(curr_state)
+        elif final_reward > max_rewards[max_rewards_min_idx]:
+            max_rewards_min_idx = max_rewards.index(min(max_rewards))
+
+            max_rewards.remove(max_rewards[max_rewards_min_idx])
+            max_rewards_smiles.remove(max_rewards_smiles[max_rewards_min_idx])
+
+            max_rewards.append(final_reward)
+            max_rewards_smiles.append(curr_state)
+
         episodes += 1
         eps_threshold *= 0.99907
         batch_losses = []
@@ -142,3 +163,9 @@ for it in range(iterations):
             loss = agent.update_params(batch_size, config.gamma, config.polyak)
             loss = loss.item()
             batch_losses.append(loss)
+
+outf = open("result_smiles.csv", "w")
+outf.write("Reward;Smiles\n")
+for smiles_text, max_reward in zip(max_rewards, max_rewards_smiles):
+    outf.write(f"{smiles_text};{max_reward}\n")
+outf.close()

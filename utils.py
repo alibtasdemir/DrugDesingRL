@@ -7,6 +7,18 @@ import config
 
 
 def atom_valences(atom_types):
+    """Creates a list of valences corresponding to atom_types.
+
+  Note that this is not a count of valence electrons, but a count of the
+  maximum number of bonds each element will make. For example, passing
+  atom_types ['C', 'H', 'O'] will return [4, 1, 2].
+
+  Args:
+    atom_types: List of string atom types, e.g. ['C', 'H', 'O'].
+
+  Returns:
+    List of integer atom valences.
+  """
     periodic_table = Chem.GetPeriodicTable()
     return [
         max(list(periodic_table.GetValenceList(atom_type))) for atom_type in atom_types

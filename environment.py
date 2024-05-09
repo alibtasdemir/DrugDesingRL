@@ -79,9 +79,10 @@ def get_valid_actions(
         return copy.deepcopy(atom_types)
     mol = Chem.MolFromSmiles(state)
     if mol is None:
-        raise ValueError("Received invalid state: %s" % state)
+        raise ValueError('Received invalid state: %s' % state)
     atom_valences = {
-        atom_type: utils.atom_valences([atom_type])[0] for atom_type in atom_types
+        atom_type: utils.atom_valences([atom_type])[0]
+        for atom_type in atom_types
     }
     atoms_with_free_valence = {}
     for i in range(1, max(atom_valences.values())):
@@ -96,17 +97,13 @@ def get_valid_actions(
             mol,
             atom_types=atom_types,
             atom_valences=atom_valences,
-            atoms_with_free_valence=atoms_with_free_valence,
-        )
-    )
+            atoms_with_free_valence=atoms_with_free_valence))
     valid_actions.update(
         _bond_addition(
             mol,
             atoms_with_free_valence=atoms_with_free_valence,
             allowed_ring_sizes=allowed_ring_sizes,
-            allow_bonds_between_rings=allow_bonds_between_rings,
-        )
-    )
+            allow_bonds_between_rings=allow_bonds_between_rings))
     if allow_removal:
         valid_actions.update(_bond_removal(mol))
     if allow_no_modification:

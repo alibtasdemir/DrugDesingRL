@@ -181,18 +181,11 @@ class ReplayBuffer(object):
             obses_t.append(np.array(obs_t, copy=False))
             actions.append(np.array(action, copy=False))
             rewards.append(reward)
-            obses_tp1.append(np.array(obs_tp1, copy=False))
+            obses_tp1.append(np.array(obs_tp1[0], copy=False))
             dones.append(done)
 
-        obses_t = np.array(obses_t)
-        actions = np.array(actions)
-        #print([len(x) for x in obses_t])
-        rewards = np.array(rewards)
-        #print([len(x) for x in obses_tp1])
-        #print(len(obses_tp1[0]))
-        obses_tp1 = np.array(obses_tp1)
-        dones = np.array(dones)
-        #print(f"obses_t {obses_t.shape}\nactions {}\nrewards {}\nobses_tp1 {}\ndones {}")
+        # print(obses_tp1)
+        # print([len(x) for x in obses_tp1])
         return np.array(obses_t), np.array(actions), np.array(rewards), np.array(obses_tp1), np.array(dones)
 
     def sample(self, batch_size):
