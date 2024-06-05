@@ -14,7 +14,8 @@
 # limitations under the License.
 
 # Lint as: python2, python3
-"""Defines the Markov decision process of generating a molecule.
+"""
+Defines the Markov decision process of generating a molecule.
 
 The problem of molecule generation as a Markov decision process, the
 state space, action space, and reward function are defined.
@@ -37,13 +38,12 @@ import utils
 
 
 class Result(collections.namedtuple("Result", ["state", "reward", "terminated"])):
-    """A namedtuple defines the result of a step for the molecule class.
-
-    The namedtuple contains the following fields:
-      state: Chem.RWMol. The molecule reached after taking the action.
-      reward: Float. The reward get after taking the action.
-      terminated: Boolean. Whether this episode is terminated.
-  """
+    """
+    A structured object to store the response of the environment to the agent.
+    state: Chem.RWMol. The molecule reached at the current step
+    reward: Float. The QED reward get after taking the action
+    terminated: bool. Flag value for terminal state
+    """
 
 
 def get_valid_actions(
@@ -54,26 +54,16 @@ def get_valid_actions(
     allowed_ring_sizes,
     allow_bonds_between_rings,
 ):
-    """Computes the set of valid actions for a given state.
-
-  Args:
-    state: String SMILES; the current state. If None or the empty string, we
-      assume an "empty" state with no atoms or bonds.
-    atom_types: Set of string atom types, e.g. {'C', 'O'}.
-    allow_removal: Boolean whether to allow actions that remove atoms and bonds.
-    allow_no_modification: Boolean whether to include a "no-op" action.
-    allowed_ring_sizes: Set of integer allowed ring sizes; used to remove some
-      actions that would create rings with disallowed sizes.
-    allow_bonds_between_rings: Boolean whether to allow actions that add bonds
-      between atoms that are both in rings.
-
-  Returns:
-    Set of string SMILES containing the valid actions (technically, the set of
-    all states that are acceptable from the given state).
-
-  Raises:
-    ValueError: If state does not represent a valid molecule.
-  """
+    """
+    Search the valid options for a given molecule
+    :param state: str. SMILES string of the molecule
+    :param atom_types: Set of string atom types
+    :param allow_removal: bool. Flag value for allowing removal operations
+    :param allow_no_modification: bool. Flag value to set "no-op" action
+    :param allowed_ring_sizes: Set of integer values for allowed ring sizes
+    :param allow_bonds_between_rings: bool. Flag value for allowing bonds between ring structures
+    :return: Set of SMILES contains the valid next states
+    """
     if not state:
         # Available actions are adding a node of each type.
         return copy.deepcopy(atom_types)
@@ -112,33 +102,14 @@ def get_valid_actions(
 
 
 def _atom_addition(state, atom_types, atom_valences, atoms_with_free_valence):
-    """Computes valid actions that involve adding atoms to the graph.
-
-  Actions:
-    * Add atom (with a bond connecting it to the existing graph)
-
-  Each added atom is connected to the graph by a bond. There is a separate
-  action for connecting to (a) each existing atom with (b) each valence-allowed
-  bond type. Note that the connecting bond is only of type single, double, or
-  triple (no aromatic bonds are added).
-
-  For example, if an existing carbon atom has two empty valence positions and
-  the available atom types are {'C', 'O'}, this section will produce new states
-  where the existing carbon is connected to (1) another carbon by a double bond,
-  (2) another carbon by a single bond, (3) an oxygen by a double bond, and
-  (4) an oxygen by a single bond.
-
-  Args:
-    state: RDKit Mol.
-    atom_types: Set of string atom types.
-    atom_valences: Dict mapping string atom types to integer valences.
-    atoms_with_free_valence: Dict mapping integer minimum available valence
-      values to lists of integer atom indices. For instance, all atom indices in
-      atoms_with_free_valence[2] have at least two available valence positions.
-
-  Returns:
-    Set of string SMILES; the available actions.
-  """
+    """
+    Computes valid actions that involve adding atoms to the molecule.
+    :param state: RDKit. Molecule
+    :param atom_types: Set of string atom types.
+    :param atom_valences: Dict mapping string atom types to integer valences.
+    :param atoms_with_free_valence: Dict mapping integer minimum available valence
+    :return: Set of string SMILES; the available actions.
+    """
     bond_order = {
         1: Chem.BondType.SINGLE,
         2: Chem.BondType.DOUBLE,
@@ -163,28 +134,14 @@ def _atom_addition(state, atom_types, atom_valences, atoms_with_free_valence):
 def _bond_addition(
     state, atoms_with_free_valence, allowed_ring_sizes, allow_bonds_between_rings
 ):
-    """Computes valid actions that involve adding bonds to the graph.
-
-  Actions (where allowed):
-    * None->{single,double,triple}
-    * single->{double,triple}
-    * double->{triple}
-
-  Note that aromatic bonds are not modified.
-
-  Args:
-    state: RDKit Mol.
-    atoms_with_free_valence: Dict mapping integer minimum available valence
-      values to lists of integer atom indices. For instance, all atom indices in
-      atoms_with_free_valence[2] have at least two available valence positions.
-    allowed_ring_sizes: Set of integer allowed ring sizes; used to remove some
-      actions that would create rings with disallowed sizes.
-    allow_bonds_between_rings: Boolean whether to allow actions that add bonds
-      between atoms that are both in rings.
-
-  Returns:
-    Set of string SMILES; the available actions.
-  """
+    """
+    Computes valid actions that involve adding bonds to the molecule.
+    :param state: RDKit. Molecule
+    :param atoms_with_free_valence: Dict mapping integer minimum available valence
+    :param allowed_ring_sizes: Set of integer allowed ring sizes
+    :param allow_bonds_between_rings: bool. Flag value for allowing bonds between ring structures
+    :return: Set of string SMILES; the available actions.
+    """
     bond_orders = [
         None,
         Chem.BondType.SINGLE,
@@ -241,23 +198,11 @@ def _bond_addition(
 
 
 def _bond_removal(state):
-    """Computes valid actions that involve removing bonds from the graph.
-
-  Actions (where allowed):
-    * triple->{double,single,None}
-    * double->{single,None}
-    * single->{None}
-
-  Bonds are only removed (single->None) if the resulting graph has zero or one
-  disconnected atom(s); the creation of multi-atom disconnected fragments is not
-  allowed. Note that aromatic bonds are not modified.
-
-  Args:
-    state: RDKit Mol.
-
-  Returns:
-    Set of string SMILES; the available actions.
-  """
+    """
+    Computes valid actions that involve removing bonds from the molecule.
+    :param state: RDKit Molecule
+    :return: Set of string SMILES; the available actions.
+    """
     bond_orders = [
         None,
         Chem.BondType.SINGLE,
@@ -311,7 +256,9 @@ def _bond_removal(state):
 
 
 class Molecule(object):
-    """Defines the Markov decision process of generating a molecule."""
+    """
+    Defines the Markov decision process of generating a molecule
+    """
 
     def __init__(
         self,
@@ -325,34 +272,18 @@ class Molecule(object):
         target_fn=None,
         record_path=False,
     ):
-        """Initializes the parameters for the MDP.
-
-    Internal state will be stored as SMILES strings.
-
-    Args:
-      atom_types: The set of elements the molecule may contain.
-      init_mol: String, Chem.Mol, or Chem.RWMol. If string is provided, it is
-        considered as the SMILES string. The molecule to be set as the initial
-        state. If None, an empty molecule will be created.
-      allow_removal: Boolean. Whether to allow removal of a bond.
-      allow_no_modification: Boolean. If true, the valid action set will
-        include doing nothing to the current molecule, i.e., the current
-        molecule itself will be added to the action set.
-      allow_bonds_between_rings: Boolean. If False, new bonds connecting two
-        atoms which are both in rings are not allowed.
-        DANGER Set this to False will disable some of the transformations eg.
-        c2ccc(Cc1ccccc1)cc2 -> c1ccc3c(c1)Cc2ccccc23
-        But it will make the molecules generated make more sense chemically.
-      allowed_ring_sizes: Set of integers or None. The size of the ring which
-        is allowed to form. If None, all sizes will be allowed. If a set is
-        provided, only sizes in the set is allowed.
-      max_steps: Integer. The maximum number of steps to run.
-      target_fn: A function or None. The function should have Args of a
-        String, which is a SMILES string (the state), and Returns as
-        a Boolean which indicates whether the input satisfies a criterion.
-        If None, it will not be used as a criterion.
-      record_path: Boolean. Whether to record the steps internally.
-    """
+        """
+        Initializes the parameters for the MDP.
+        :param atom_types: The set of elements the molecule may contain
+        :param init_mol: str. Initial molecule to start with
+        :param allow_removal: bool. Flag value for allowing removal operations
+        :param allow_no_modification: bool. Flag value to set "no-op" action
+        :param allow_bonds_between_rings: bool. Flag value for allowing bonds between ring structures
+        :param allowed_ring_sizes: Set of integer values for allowed ring sizes
+        :param max_steps: int. Max steps to run the environment
+        :param target_fn: A function or None.
+        :param record_path: bool. Whether to record the steps internally.
+        """
         if isinstance(init_mol, Chem.Mol):
             init_mol = Chem.MolToSmiles(init_mol)
         self.init_mol = init_mol
@@ -387,7 +318,9 @@ class Molecule(object):
         return self._path
 
     def initialize(self):
-        """Resets the MDP to its initial state."""
+        """
+        Resets the MDP to the initial state. Restarts the environment.
+        """
         self._state = self.init_mol
         if self.record_path:
             self._path = [self._state]
@@ -395,23 +328,12 @@ class Molecule(object):
         self._counter = 0
 
     def get_valid_actions(self, state=None, force_rebuild=False):
-        """Gets the valid actions for the state.
-
-    In this design, we do not further modify a aromatic ring. For example,
-    we do not change a benzene to a 1,3-Cyclohexadiene. That is, aromatic
-    bonds are not modified.
-
-    Args:
-      state: String, Chem.Mol, or Chem.RWMol. If string is provided, it is
-        considered as the SMILES string. The state to query. If None, the
-        current state will be considered.
-      force_rebuild: Boolean. Whether to force rebuild of the valid action
-        set.
-
-    Returns:
-      A set contains all the valid actions for the state. Each action is a
-        SMILES string. The action is actually the resulting state.
-    """
+        """
+        Gets the valid actions for the state.
+        :param state: str. The current molecule in the state
+        :param force_rebuild: bool. Flag value to force rebuild of the valid action set
+        :return: A set contains all the valid actions for the state
+        """
         if state is None:
             if self._valid_actions and not force_rebuild:
                 return copy.deepcopy(self._valid_actions)
@@ -429,47 +351,30 @@ class Molecule(object):
         return copy.deepcopy(self._valid_actions)
 
     def _reward(self):
-        """Gets the reward for the state.
-
-    A child class can redefine the reward function if reward other than
-    zero is desired.
-
-    Returns:
-      Float. The reward for the current state.
-    """
+        """
+        Gets the reward function. Implemented as dummy.
+        :return: The reward for the current state
+        """
         return 0.0
 
     def _goal_reached(self):
-        """Sets the termination criterion for molecule Generation.
-
-    A child class can define this function to terminate the MDP before
-    max_steps is reached.
-
-    Returns:
-      Boolean, whether the goal is reached or not. If the goal is reached,
-        the MDP is terminated.
-    """
+        """
+        Sets the termination criterion for molecule
+        :return: bool. Flag value if reached the goal.
+        """
         if self._target_fn is None:
             return False
         return self._target_fn(self._state)
 
     def step(self, action):
-        """Takes a step forward according to the action.
-
-    Args:
-      action: Chem.RWMol. The action is actually the target of the modification.
-
-    Returns:
-      results: Namedtuple containing the following fields:
-        * state: The molecule reached after taking the action.
-        * reward: The reward get after taking the action.
-        * terminated: Whether this episode is terminated.
-
-    Raises:
-      ValueError: If the number of steps taken exceeds the preset max_steps, or
-        the action is not in the set of valid_actions.
-
-    """
+        """
+        akes a step forward according to the action.
+        :param action: Chem.RWMol. The target molecule for the action
+        :return: Result. Namedtuple defined with
+            * state: The molecule reached after taking the action.
+            * reward: The reward get after taking the action.
+            * terminated: Whether this episode is terminated.
+        """
         if self._counter >= self.max_steps or self._goal_reached():
             raise ValueError("This episode is terminated.")
         if action not in self._valid_actions:
@@ -487,17 +392,12 @@ class Molecule(object):
         return result
 
     def visualize_state(self, state=None, **kwargs):
-        """Draws the molecule of the state.
-
-    Args:
-      state: String, Chem.Mol, or Chem.RWMol. If string is prov ided, it is
-        considered as the SMILES string. The state to query. If None, the
-        current state will be considered.
-      **kwargs: The keyword arguments passed to Draw.MolToImage.
-
-    Returns:
-      A PIL image containing a drawing of the molecule.
-    """
+        """
+        Draws the current molecule.
+        :param state: String. If string is given it will be drawn. Else the current state will be used.
+        :param kwargs: The keyword arguments to pass Draw.MolToImage
+        :return: A PIL image containing a drawing of the molecule
+        """
         if state is None:
             state = self._state
         if isinstance(state, str):
