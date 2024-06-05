@@ -92,8 +92,8 @@ The requirements provided in `reqiurements.txt`.
 
 1. Clone the repo
    ```bash
-   git clone https://github.com/alibtasdemir/DrugDesignRL.git
-   cd DrugDesignRL
+   git clone https://github.com/alibtasdemir/DrugDesingRL.git
+   cd DrugDesingRL
    ```
 2. Create a virtual environment (conda)
    ```bash
@@ -126,7 +126,7 @@ The requirements provided in `reqiurements.txt`.
 
 Ali Baran Taşdemir - [@alibrnt](https://twitter.com/alibrnt) - alibaran@tasdemir.us
 
-Project Link: [https://github.com/alibtasdemir/DrugDesignRL](https://github.com/alibtasdemir/DrugDesignRL)
+Project Link: [https://github.com/alibtasdemir/DrugDesingRL](https://github.com/alibtasdemir/DrugDesingRL)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -146,16 +146,16 @@ Project Link: [https://github.com/alibtasdemir/DrugDesignRL](https://github.com/
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/alibtasdemir/DrugDesignRL.svg?style=for-the-badge
-[contributors-url]: https://github.com/alibtasdemir/DrugDesignRL/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/alibtasdemir/DrugDesignRL.svg?style=for-the-badge
-[forks-url]: https://github.com/alibtasdemir/DrugDesignRL/network/members
-[stars-shield]: https://img.shields.io/github/stars/alibtasdemir/DrugDesignRL.svg?style=for-the-badge
-[stars-url]: https://github.com/alibtasdemir/DrugDesignRL/stargazers
-[issues-shield]: https://img.shields.io/github/issues/alibtasdemir/DrugDesignRL.svg?style=for-the-badge
-[issues-url]: https://github.com/alibtasdemir/DrugDesignRL/issues
-[license-shield]: https://img.shields.io/github/license/alibtasdemir/DrugDesignRL.svg?style=for-the-badge
-[license-url]: https://github.com/alibtasdemir/DrugDesignRL/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/alibtasdemir/DrugDesingRL.svg?style=for-the-badge
+[contributors-url]: https://github.com/alibtasdemir/DrugDesingRL/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/alibtasdemir/DrugDesingRL.svg?style=for-the-badge
+[forks-url]: https://github.com/alibtasdemir/DrugDesingRL/network/members
+[stars-shield]: https://img.shields.io/github/stars/alibtasdemir/DrugDesingRL.svg?style=for-the-badge
+[stars-url]: https://github.com/alibtasdemir/DrugDesingRL/stargazers
+[issues-shield]: https://img.shields.io/github/issues/alibtasdemir/DrugDesingRL.svg?style=for-the-badge
+[issues-url]: https://github.com/alibtasdemir/DrugDesingRL/issues
+[license-shield]: https://img.shields.io/github/license/alibtasdemir/DrugDesingRL.svg?style=for-the-badge
+[license-url]: https://github.com/alibtasdemir/DrugDesingRL/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/alibtasdemir
 [product-screenshot]: images/screenshot.png
